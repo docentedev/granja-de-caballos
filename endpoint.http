@@ -1,0 +1,40 @@
+
+### Listar todos los tipos
+GET http://localhost:8080/api/tipos
+Accept: application/json
+
+### Obtener tipo por id
+GET http://localhost:8080/api/tipos/1
+Accept: application/json
+
+### Crear un tipo
+POST http://localhost:8080/api/tipos
+Content-Type: application/json
+
+{
+	"nombre": "Pura Raza",
+	"descripcion": "Caballo de pura raza, origen..."
+}
+
+### Actualizar un tipo
+PUT http://localhost:8080/api/tipos/1
+Content-Type: application/json
+
+{
+	"nombre": "Pura Raza Modificada",
+	"descripcion": "Descripción actualizada"
+}
+
+### Eliminar un tipo
+DELETE http://localhost:8080/api/tipos/1
+
+### Ejemplos curl (alternativa)
+# Listar
+curl -sS http://localhost:8080/api/tipos
+# Crear
+curl -sS -X POST http://localhost:8080/api/tipos -H 'Content-Type: application/json' -d '{"nombre":"Criollo","descripcion":"Criollo chileno"}'
+# Actualizar
+curl -sS -X PUT http://localhost:8080/api/tipos/1 -H 'Content-Type: application/json' -d '{"nombre":"Criollo Mod","descripcion":"Actualizado"}'
+# Borrar
+curl -sS -X DELETE http://localhost:8080/api/tipos/1
+
