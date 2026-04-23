@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.granja.caballos.exception.ResourceNotFoundException;
+import com.granja.caballos.dto.TipoCaballoDto;
+import com.granja.caballos.exception.NotFoundException;
 import com.granja.caballos.model.TipoCaballo;
 import com.granja.caballos.repository.TipoCaballoRepository;
 
@@ -18,30 +19,44 @@ public class TipoCaballoServiceImpl implements TipoCaballoService {
     }
 
     @Override
-    public List<TipoCaballo> findAll() {
-        return repository.findAll();
+    public List<TipoCaballoDto> findAll() {
+        return repository.findAll().stream().map(this::entityToDto).toList();
     }
 
     @Override
-    public TipoCaballo findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("TipoCaballo no encontrado: " + id));
+    public TipoCaballoDto findById(Long id) {
+        TipoCaballo tipo = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("TipoCaballo no encontrado: " + id));
+        return entityToDto(tipo);
     }
 
     @Override
-    public TipoCaballo create(TipoCaballo tipo) {
-        return repository.save(tipo);
+    public TipoCaballoDto create(TipoCaballoDto req) {
+        return entityToDto(repository.save(dtoToEntity(req)));
     }
 
     @Override
-    public TipoCaballo update(Long id, TipoCaballo tipo) {
-        TipoCaballo existing = findById(id);
-        existing.setNombre(tipo.getNombre());
-        existing.setDescripcion(tipo.getDescripcion());
-        return repository.save(existing);
+    public TipoCaballoDto update(Long id, TipoCaballoDto req) {
+        TipoCaballo existing = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("TipoCaballo no encontrado: " + id));
+        TipoCaballo updated = dtoToEntity(req);
+        updated.setId(existing.getId());
+        return entityToDto(repository.save(updated));
     }
 
     @Override
     public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new NotFoundException("TipoCaballo no encontrado: " + id);
+        }
         repository.deleteById(id);
+    }
+
+    private TipoCaballoDto entityToDto(TipoCaballo entity) {
+        return new TipoCaballoDto(entity.getId(), entity.getNombre(), entity.getDescripcion());
+    }
+
+    private TipoCaballo dtoToEntity(TipoCaballoDto dto) {
+        return new TipoCaballo(dto.nombre(), dto.descripcion());
     }
 }

@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.granja.caballos.model.TipoCaballo;
+import com.granja.caballos.dto.TipoCaballoDto;
 import com.granja.caballos.service.TipoCaballoService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/tipos")
@@ -27,24 +29,24 @@ public class TipoCaballoController {
     }
 
     @GetMapping
-    public List<TipoCaballo> list() {
+    public List<TipoCaballoDto> list() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TipoCaballo> get(@PathVariable Long id) {
+    public ResponseEntity<TipoCaballoDto> get(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<TipoCaballo> create(@RequestBody TipoCaballo tipo) {
-        TipoCaballo created = service.create(tipo);
-        return ResponseEntity.created(URI.create("/api/tipos/" + created.getId())).body(created);
+    public ResponseEntity<TipoCaballoDto> create(@Valid @RequestBody TipoCaballoDto req) {
+        TipoCaballoDto created = service.create(req);
+        return ResponseEntity.created(URI.create("/api/tipos/" + created.id())).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TipoCaballo> update(@PathVariable Long id, @RequestBody TipoCaballo tipo) {
-        TipoCaballo updated = service.update(id, tipo);
+    public ResponseEntity<TipoCaballoDto> update(@PathVariable Long id, @Valid @RequestBody TipoCaballoDto req) {
+        TipoCaballoDto updated = service.update(id, req);
         return ResponseEntity.ok(updated);
     }
 

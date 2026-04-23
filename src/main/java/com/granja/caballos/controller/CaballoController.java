@@ -13,48 +13,40 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.granja.caballos.dto.CaballoRequest;
-import com.granja.caballos.model.Caballo;
-import com.granja.caballos.model.TipoCaballo;
+import com.granja.caballos.dto.CaballoDto;
 import com.granja.caballos.service.CaballoService;
-import com.granja.caballos.service.TipoCaballoService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/caballos")
 public class CaballoController {
 
     private final CaballoService service;
-    private final TipoCaballoService tipoService;
 
-    public CaballoController(CaballoService service, TipoCaballoService tipoService) {
+    public CaballoController(CaballoService service) {
         this.service = service;
-        this.tipoService = tipoService;
     }
 
     @GetMapping
-    public List<Caballo> list() {
+    public List<CaballoDto> list() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Caballo> get(@PathVariable Long id) {
+    public ResponseEntity<CaballoDto> get(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Caballo> create(@RequestBody CaballoRequest req) {
-        TipoCaballo tipo = tipoService.findById(req.getTipoId());
-        Caballo c = new Caballo(req.getNombre(), req.getEdad(), tipo);
-        Caballo created = service.create(c);
-        return ResponseEntity.created(URI.create("/api/caballos/" + created.getId())).body(created);
+    public ResponseEntity<CaballoDto> create(@Valid @RequestBody CaballoDto req) {
+        CaballoDto created = service.create(req);
+        return ResponseEntity.created(URI.create("/api/caballos/" + created.id())).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Caballo> update(@PathVariable Long id, @RequestBody CaballoRequest req) {
-        TipoCaballo tipo = null;
-        if (req.getTipoId() != null) tipo = tipoService.findById(req.getTipoId());
-        Caballo c = new Caballo(req.getNombre(), req.getEdad(), tipo);
-        Caballo updated = service.update(id, c);
+    public ResponseEntity<CaballoDto> update(@PathVariable Long id, @Valid @RequestBody CaballoDto req) {
+        CaballoDto updated = service.update(id, req);
         return ResponseEntity.ok(updated);
     }
 

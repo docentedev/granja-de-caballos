@@ -2,12 +2,16 @@ package com.granja.caballos.service;
 
 import java.util.List;
 
-import com.granja.caballos.model.TipoCaballo;
+import com.granja.caballos.dto.TipoCaballoDto;
 
 public interface TipoCaballoService {
-    List<TipoCaballo> findAll();
-    TipoCaballo findById(Long id);
-    TipoCaballo create(TipoCaballo tipo);
-    TipoCaballo update(Long id, TipoCaballo tipo);
+    List<TipoCaballoDto> findAll();
+
+    TipoCaballoDto findById(Long id);
+
+    TipoCaballoDto create(TipoCaballoDto req);
+
+    TipoCaballoDto update(Long id, TipoCaballoDto req);
+
     void delete(Long id);
 }

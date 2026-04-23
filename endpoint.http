@@ -28,6 +28,18 @@ Content-Type: application/json
 ### Eliminar un tipo
 DELETE http://localhost:8080/api/tipos/1
 
+### Crear Caballo
+POST http://localhost:8080/api/caballos
+Content-Type: application/json
+
+{
+	"nombre": "Tiro al Blanco",
+	"edad": 15,
+	"tipo": {
+		"id": 1
+	}
+}
+
 ### Ejemplos curl (alternativa)
 # Listar
 curl -sS http://localhost:8080/api/tipos

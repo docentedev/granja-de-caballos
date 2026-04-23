@@ -4,57 +4,77 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.granja.caballos.exception.ResourceNotFoundException;
+import com.granja.caballos.dto.CaballoDto;
+import com.granja.caballos.dto.TipoCaballoDto;
+import com.granja.caballos.exception.NotFoundException;
 import com.granja.caballos.model.Caballo;
 import com.granja.caballos.model.TipoCaballo;
 import com.granja.caballos.repository.CaballoRepository;
-import com.granja.caballos.repository.TipoCaballoRepository;
 
 @Service
 public class CaballoServiceImpl implements CaballoService {
 
     private final CaballoRepository repo;
-    private final TipoCaballoRepository tipoRepo;
+    private final TipoCaballoService tipoService;
 
-    public CaballoServiceImpl(CaballoRepository repo, TipoCaballoRepository tipoRepo) {
+    public CaballoServiceImpl(CaballoRepository repo, TipoCaballoService tipoService) {
         this.repo = repo;
-        this.tipoRepo = tipoRepo;
+        this.tipoService = tipoService;
     }
 
     @Override
-    public List<Caballo> findAll() {
-        return repo.findAll();
+    public List<CaballoDto> findAll() {
+        return repo.findAll().stream().map(this::entityToDto).toList();
     }
 
     @Override
-    public Caballo findById(Long id) {
-        return repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Caballo no encontrado: " + id));
+    public CaballoDto findById(Long id) throws NotFoundException {
+        Caballo caballo = repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Caballo no encontrado: " + id));
+        return entityToDto(caballo);
     }
 
     @Override
-    public Caballo create(Caballo caballo) {
-        // ensure tipo exists
-        TipoCaballo tipo = tipoRepo.findById(caballo.getTipo().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("TipoCaballo no encontrado: " + caballo.getTipo().getId()));
-        caballo.setTipo(tipo);
-        return repo.save(caballo);
+    public CaballoDto create(CaballoDto req) {
+        return entityToDto(repo.save(dtoToEntity(req)));
     }
 
     @Override
-    public Caballo update(Long id, Caballo caballo) {
-        Caballo existing = findById(id);
-        existing.setNombre(caballo.getNombre());
-        existing.setEdad(caballo.getEdad());
-        if (caballo.getTipo() != null) {
-            TipoCaballo tipo = tipoRepo.findById(caballo.getTipo().getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("TipoCaballo no encontrado: " + caballo.getTipo().getId()));
-            existing.setTipo(tipo);
+    public CaballoDto update(Long id, CaballoDto req) throws NotFoundException {
+        Caballo existing = repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Caballo no encontrado: " + id));
+        Caballo updated = dtoToEntity(req);
+        updated.setId(existing.getId());
+        return entityToDto(repo.save(updated));
+    }
+
+    @Override
+    public void delete(Long id) throws NotFoundException {
+        if (!repo.existsById(id)) {
+            throw new NotFoundException("Caballo no encontrado: " + id);
         }
-        return repo.save(existing);
+        repo.deleteById(id);
     }
 
-    @Override
-    public void delete(Long id) {
-        repo.deleteById(id);
+    private CaballoDto entityToDto(Caballo entity) {
+        return new CaballoDto(entity.getId(), entity.getNombre(), entity.getEdad(),
+                tipoEntityToDto(entity.getTipo()));
+    }
+
+    private TipoCaballoDto tipoEntityToDto(TipoCaballo tipo) {
+        return new TipoCaballoDto(tipo.getId(), tipo.getNombre(), tipo.getDescripcion());
+    }
+
+    private Caballo dtoToEntity(CaballoDto dto) {
+        TipoCaballoDto tipo = tipoService.findById(dto.tipo().id());
+        return new Caballo(dto.nombre(), dto.edad(), dtoToTipoEntity(tipo));
+    }
+
+    private TipoCaballo dtoToTipoEntity(TipoCaballoDto dto) {
+        TipoCaballo tipo = new TipoCaballo();
+        tipo.setId(dto.id());
+        tipo.setNombre(dto.nombre());
+        tipo.setDescripcion(dto.descripcion());
+        return tipo;
     }
 }
