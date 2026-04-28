@@ -57,7 +57,7 @@ public class CaballoServiceImpl implements CaballoService {
     }
 
     private CaballoDto entityToDto(Caballo entity) {
-        return new CaballoDto(entity.getId(), entity.getNombre(), entity.getEdad(),
+        return new CaballoDto(entity.getId(), entity.getNombre(), entity.getColor(), entity.getEdad(),
                 tipoEntityToDto(entity.getTipo()));
     }
 
@@ -67,7 +67,7 @@ public class CaballoServiceImpl implements CaballoService {
 
     private Caballo dtoToEntity(CaballoDto dto) {
         TipoCaballoDto tipo = tipoService.findById(dto.tipo().id());
-        return new Caballo(dto.nombre(), dto.edad(), dtoToTipoEntity(tipo));
+        return new Caballo(dto.nombre(), dto.color(), dto.edad(), dtoToTipoEntity(tipo));
     }
 
     private TipoCaballo dtoToTipoEntity(TipoCaballoDto dto) {

@@ -20,6 +20,9 @@ public class Caballo {
     @Column(nullable = false)
     private String nombre;
 
+    @Column(nullable = false)
+    private String color;
+
     private Integer edad;
 
     @ManyToOne(optional = false)
@@ -28,8 +31,9 @@ public class Caballo {
 
     public Caballo() {}
 
-    public Caballo(String nombre, Integer edad, TipoCaballo tipo) {
+    public Caballo(String nombre, String color, Integer edad, TipoCaballo tipo) {
         this.nombre = nombre;
+        this.color = color;
         this.edad = edad;
         this.tipo = tipo;
     }
@@ -48,6 +52,14 @@ public class Caballo {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public Integer getEdad() {
